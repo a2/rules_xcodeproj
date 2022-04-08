@@ -1198,7 +1198,7 @@ def _process_dependencies(*, attrs_info, transitive_infos):
             [info.target.id] if info.target else info.dependencies
             for attr, info in transitive_infos
             if (not attrs_info or
-                attrs_info.xcode_targets.get(attr) == info.target_type)
+                info.target_type in attrs_info.xcode_targets.get(attr, [None]))
         ])
     ]
 
@@ -1213,7 +1213,7 @@ def _process_defines(
     transitive_cc_defines = []
     for attr, info in transitive_infos:
         if (attrs_info and
-            attrs_info.xcode_targets.get(attr) != info.target_type):
+            info.target_type not in attrs_info.xcode_targets.get(attr, [None])):
             continue
         transitive_defines = info.defines
         transitive_cc_defines.extend(transitive_defines.cc_defines)
@@ -1435,8 +1435,8 @@ def _process_target(*, ctx, target, transitive_infos):
             transitive = [
                 info.potential_target_merges
                 for attr, info in transitive_infos
-                if (processed_target.attrs_info.xcode_targets.get(attr) ==
-                    info.target_type)
+                if (info.target_type in
+                    processed_target.attrs_info.xcode_targets.get(attr, [None]))
             ],
         ),
         required_links = depset(
@@ -1444,8 +1444,8 @@ def _process_target(*, ctx, target, transitive_infos):
             transitive = [
                 info.required_links
                 for attr, info in transitive_infos
-                if (processed_target.attrs_info.xcode_targets.get(attr) ==
-                    info.target_type)
+                if (info.target_type in
+                    processed_target.attrs_info.xcode_targets.get(attr, [None]))
             ],
         ),
         resource_bundles = processed_target.resource_bundles,
@@ -1458,8 +1458,8 @@ def _process_target(*, ctx, target, transitive_infos):
             transitive = [
                 info.xcode_targets
                 for attr, info in transitive_infos
-                if (processed_target.attrs_info.xcode_targets.get(attr) ==
-                    info.target_type)
+                if (info.target_type in
+                    processed_target.attrs_info.xcode_targets.get(attr, [None]))
             ],
         ),
     )
