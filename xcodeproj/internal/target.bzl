@@ -1487,6 +1487,15 @@ def _process_target(*, ctx, target, transitive_infos):
             transitive_infos = transitive_infos,
         )
 
+    excluded_xcode_targets = [
+        ", ".join([info.target.id, info.target_type, attr]) if info.target else info.xcode_targets
+        for attr, info in transitive_infos
+        if not (processed_target.attrs_info.xcode_targets.get(attr) ==
+            info.target_type) and info.target
+    ]
+    if excluded_xcode_targets:
+        print(target.label, "excluding targets:\n{}".format(json.encode_indent(excluded_xcode_targets)))
+
     return _target_info_fields(
         defines = processed_target.defines,
         dependencies = processed_target.dependencies,
